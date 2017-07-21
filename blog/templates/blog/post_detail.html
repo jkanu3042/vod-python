@@ -1,0 +1,57 @@
+{% extends "blog/layout.html" %}
+{% load imagekit %}
+
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            {% block title %}
+
+            {{post.title}}
+            {% endblock %}
+
+            <h2>{{post.title}}</h2>
+
+            <!--<img src="/media/{{post.photo}}" style="max-width: 100%" />-->
+            {% if post.photo %}
+                <img src="{{ post.photo_thumbnail.url }}" style="max-width: 100%" />
+
+                {% comment %}
+                    thumbnail 탬플릿 태그를 썼을 때 뒤에 as 로 별칭을 주면 따로 출력해주지 않는다.
+                    고로 뒤에 img 태그에 커스텀하게 구성가능
+                {% endcomment %}
+                {% thumbnail "200x200" post.photo as thumb %}
+                <img src="{{thumb.url}}" width="{{ thumb.width}}", height="{{thumb.height}}" />
+
+
+                {% comment %}
+                    thumbnail 탬플릿 태그에 찍찍 그으면 style, onclick, class 등의 속성을 쓸 수 있다.
+                    {% thumbnail "200x200" post.photo -- style="" onclick="" class="" %}
+                {% endcomment %}
+
+
+            {% endif %}
+            <p>{{post.content|linebreaks}}</p>
+            <hr/>
+
+            <h3>Comments</h3>
+            <ul>
+                {% for comment in post.comment_set.all %}
+                <li>
+                    {{comment.message}}
+                    <small>by {{comment.author}}</small>
+                    <small>at {{comment.updated_at}}</small>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <hr/>
+            <a href="{% url "blog:post_list" %}" class="btn btn-primary">목록</a>
+            <a href="{% url "blog:post_edit" post.id %}" class="btn btn-default">수정</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+</body>
+</html>

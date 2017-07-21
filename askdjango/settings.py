@@ -25,7 +25,7 @@ SECRET_KEY = 'wrx$j5%4byp!2-eie+1cxve+2!uo7#iuquc34^dw*(whyfa8xw'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -38,10 +38,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django_extensions',
+    'debug_toolbar',
+    'imagekit',
+
     'blog',
+    'dojo',
+    'accounts',
+    'shop',
+
 ]
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -49,20 +59,29 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+
 ]
+
+
 
 ROOT_URLCONF = 'askdjango.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'askdjango', 'templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
+            # 자주 쓰는 변수의 경우, 매번 context로 view를 이용하여 넘기는 건 비효율적이므로,
+            # 미리 이렇게 정의하여 모든 탬플릿에 쓸 수 있게 한다.
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
+                #메세지 관련.
                 'django.contrib.messages.context_processors.messages',
             ],
         },
@@ -119,4 +138,48 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
+# App directory 별
 STATIC_URL = '/static/'
+'''
+
+1)http://localhost:8888/static/blog/style.css
+2)http://localhost:8888/static/style.css
+
+1,2 각각 /static/을 제거한 경로를 탐색한다.
+(이 영역은 STATIC_URL 값에 따라 다름. 유동적으로 바꿀 수도 있음.)
+즉 1) blog/style.css
+2)style.css
+
+static 파일에 있을 후보 디렉토리 목록.
+- blog/static
+- askdjango/static
+
+위 두 디렉토리에 1,2의 경로를 대입해봐서 있는걸 우선적으로 load함.
+1)은 blog/static이 될 것이며, 2)는 askdjango/static이 된다.
+'''
+
+# filesystem단 별. (TEMPLATE와 비슷)
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'askdjango', 'static')
+]
+# 배포를 위한
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+
+
+
+
+INTERNAL_IPS = ["127.0.0.1"]
+
+from django.contrib.messages import constants
+
+MESSAGE_LEVEL = constants.DEBUG # 지금부터 debug 레벨의 message를 남길 수 있음.
+MESSAGE_TAGS = {constants.ERROR : 'danger'}
+
+
+NAVER_CLIENT_ID='9aFTtzF4oHR9HuI6_Gje'
